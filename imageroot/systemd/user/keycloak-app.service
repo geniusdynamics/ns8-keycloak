@@ -21,10 +21,8 @@ ExecStartPre=-runagent discover-smarthost
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/keycloak-app.pid \
     --cidfile %t/keycloak-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/keycloak.pod-id --replace -d --name  keycloak-app \
-    --volume keycloak-app:/var/www/html/:Z \
-    --volume ./config:/tmp:Z \
-    --env=NGINX_* \
-    --env 'CONFIG_DATABASE_URI="postgresql://postgres:Nethesis,1234@127.0.0.1:5432/keycloak"' \
+    --env-file=%S/state/keycloak.env \
+    --env-file=%S/state/keycloak-db.env \
     ${KEYCLOAK_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/keycloak-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP keycloak-app
