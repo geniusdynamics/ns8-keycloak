@@ -34,4 +34,13 @@ postgres_config = {
     "POSTGRES_DB": POSTGRES_DB
 }
 agent.write_envfile("database.env", postgres_config)
+
+KC_DB_URl = f"jdbc:postgresql://postgresql-app:5432/{POSTGRES_DB}"
+keycloak_config = {
+    "KC_DB": POSTGRES_DB,
+    "KC_DB_URL": "jdbc:postgresql://localhost:5432/keycloak",
+    "KC_DB_USERNAME": POSTGRES_USER,
+    "KC_DB_PASSWORD": POSTGRES_PASSWORD,
+}
+agent.write_envfile("keycloak-db.env", keycloak_config)
 #agent.dump_env()
