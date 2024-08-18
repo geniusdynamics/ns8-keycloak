@@ -25,7 +25,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/keycloak-app.pid \
     --volume ./config:/tmp:Z \
     --env=NGINX_* \
     --env 'CONFIG_DATABASE_URI="postgresql://postgres:Nethesis,1234@127.0.0.1:5432/keycloak"' \
-    ${NGINX_IMAGE}
+    ${KEYCLOAK_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/keycloak-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP keycloak-app
 SyslogIdentifier=%u
