@@ -23,7 +23,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/keycloak-app.pid \
     --pod-id-file %t/keycloak.pod-id --replace -d --name  keycloak-app \
     --env-file=%S/state/keycloak.env \
     --env-file=%S/state/keycloak-db.env \
-    ${KEYCLOAK_IMAGE}
+    ${KEYCLOAK_IMAGE} start-dev "--http-port 7080  --https-port 7443"
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/keycloak-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP keycloak-app
 SyslogIdentifier=%u

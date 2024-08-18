@@ -22,7 +22,7 @@ ExecStartPre=/bin/rm -f %t/keycloak.pid %t/keycloak.pod-id
 ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/keycloak.pid \
     --pod-id-file %t/keycloak.pod-id \
     --name keycloak \
-    --publish 127.0.0.1:${TCP_PORT}:80 \
+    --publish 127.0.0.1:${TCP_PORT}:7443 \
     --replace
 ExecStart=/usr/bin/podman pod start --pod-id-file %t/keycloak.pod-id
 ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/keycloak.pod-id -t 10
