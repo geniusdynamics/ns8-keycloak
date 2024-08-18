@@ -17,6 +17,13 @@ import agent
 # Prepare return variable
 config = {}
 
+if os.path.exists("keycloak.env"):
+    data = agent.read_envfile("keycloak.env")
+    config["KEYCLOAK_ADMIN"] = data["KEYCLOAK_ADMIN"]
+    config["KEYCLOAK_ADMIN_PASSWORD"] = data["KEYCLOAK_ADMIN_PASSWORD"]
+else:
+    config["KEYCLOAK_ADMIN"] = ""
+    config["KEYCLOAK_ADMIN_PASSWORD"] = ""
 # Read current configuration from the environment file
 config["host"] = os.getenv("TRAEFIK_HOST","")
 config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
