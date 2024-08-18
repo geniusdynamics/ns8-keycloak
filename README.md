@@ -58,8 +58,10 @@ To uninstall the instance:
 
 To Update the instance:
 
-    api-cli run update-module --data '{"module_url":"ghcr.io/geniusdynamics/keycloak:latest","instances":["keycloak1"],"force":true}'
-
+```shell
+api-cli run update-module --data '{"module_url":"ghcr.io/geniusdynamics/keycloak:latest","instances":["keycloak1"],"force":true}'
+```
+    
 ## Smarthost setting discovery
 
 Some configuration settings, like the smarthost setup, are not part of the
