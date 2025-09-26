@@ -14,7 +14,7 @@ images=()
 repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
 reponame="keycloak"
-keycloak_version="25.0.2"
+keycloak_version="26.3.5"
 # Create a new empty container image
 container=$(buildah from scratch)
 
