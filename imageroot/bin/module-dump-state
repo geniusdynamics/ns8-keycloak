@@ -1,11 +1,16 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e
 
-echo "Dumping keycloak postgres database"
-podman exec postgresql-app pg_dump -U postgres --format=c  keycloak > keycloak.pg_dump
+if ! systemctl --user -q is-active postgresql-app.service; then
+    echo "postgresql-app.service is not running: cannot dump the database" 1>&2
+    exit 1
+fi
+
+echo "Dumping keycloak postgres database" 1>&2
+podman exec postgresql-app pg_dump -U keycloak --format=c keycloak >keycloak.pg_dump

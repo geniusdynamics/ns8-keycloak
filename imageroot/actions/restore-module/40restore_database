@@ -1,35 +1,38 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e -o pipefail
 exec 1>&2 # Redirect any output to the journal (stderr)
 
+# Restore the PostgreSQL dump into a brand new, empty data volume. The
+# postgres-data volume is not part of the backup (only the dump is), so
+# the image entrypoint initializes the database and then runs the script
+# below, which loads the dump read from standard input.
 mkdir -vp restore
 cat - >restore/keycloak_restore.sh <<'EOS'
-# Read dump file from standard input:
-pg_restore --no-owner --no-privileges -U postgres -d keycloak
+pg_restore --no-owner --no-privileges -U keycloak -d keycloak
 ec=$?
 docker_temp_server_stop
 exit $ec
 EOS
 
-# Override the image /docker-entrypoint-initdb.d contents, to restore the
-# DB dump file. The container will be stopped at the end
-
+# passwords.env was restored from the backup together with the dump.
 podman run \
     --rm \
     --interactive \
     --network=none \
     --volume=./restore:/docker-entrypoint-initdb.d/:Z \
-    --volume=postgres-data:/var/lib/postgresql/data:Z \
+    --volume=postgres-data:/var/lib/postgresql:Z \
     --replace --name=restore_db \
-    --env-file=database.env \
-    --env TZ=UTC \
-    "${POSTGRES_IMAGE}" < keycloak.pg_dump
+    --env-file=passwords.env \
+    --env=POSTGRES_USER=keycloak \
+    --env=POSTGRES_DB=keycloak \
+    --env=TZ=UTC \
+    "${POSTGRES_IMAGE}" <keycloak.pg_dump
 
 # If the restore is successful, clean up:
 rm -rfv restore/ keycloak.pg_dump

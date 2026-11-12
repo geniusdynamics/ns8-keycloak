@@ -23,7 +23,7 @@
       <cv-column>
         <cv-tile light>
           <cv-form @submit.prevent="configureModule">
-            <cv-text-input
+            <NsTextInput
               :label="$t('settings.keycloak_fqdn')"
               placeholder="keycloak.example.org"
               v-model.trim="host"
@@ -32,8 +32,8 @@
               :disabled="loading.getConfiguration || loading.configureModule"
               ref="host"
             >
-            </cv-text-input>
-            <cv-toggle
+            </NsTextInput>
+            <NsToggle
               value="letsEncrypt"
               :label="$t('settings.lets_encrypt')"
               v-model="isLetsEncryptEnabled"
@@ -46,8 +46,8 @@
               <template slot="text-right">{{
                 $t("settings.enabled")
               }}</template>
-            </cv-toggle>
-            <cv-toggle
+            </NsToggle>
+            <NsToggle
               value="httpToHttps"
               :label="$t('settings.http_to_https')"
               v-model="isHttpToHttpsEnabled"
@@ -60,36 +60,7 @@
               <template slot="text-right">{{
                 $t("settings.enabled")
               }}</template>
-            </cv-toggle>
-            <cv-text-input
-                :label="$t('Keycloak Admin')"
-                placeholder="admin@admin.com"
-                v-model="KEYCLOAK_ADMIN"
-                class="mg-bottom"
-                :invalid-message="$t(error.KEYCLOAK_ADMIN)"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                ref="KEYCLOAK_ADMIN"
-            >
-            </cv-text-input>
-            <cv-text-input
-                :label="$t('Keycloak Password')"
-                placeholder="***********"
-                v-model="KEYCLOAK_ADMIN_PASSWORD"
-                class="mg-bottom"
-                :invalid-message="$t(error.KEYCLOAK_ADMIN_PASSWORD)"
-                :disabled="loading.getConfiguration || loading.configureModule"
-                ref="KEYCLOAK_ADMIN_PASSWORD"
-                type="password"
-            >
-            </cv-text-input>
-              <!-- advanced options -->
-            <cv-accordion ref="accordion" class="maxwidth mg-bottom">
-              <cv-accordion-item :open="toggleAccordion[0]">
-                <template slot="title">{{ $t("settings.advanced") }}</template>
-                <template slot="content">
-                </template>
-              </cv-accordion-item>
-            </cv-accordion>
+            </NsToggle>
             <cv-row v-if="error.configureModule">
               <cv-column>
                 <NsInlineNotification
@@ -146,8 +117,6 @@ export default {
       host: "",
       isLetsEncryptEnabled: false,
       isHttpToHttpsEnabled: true,
-      KEYCLOAK_ADMIN: "",
-      KEYCLOAK_ADMIN_PASSWORD: "",
       loading: {
         getConfiguration: false,
         configureModule: false,
@@ -158,8 +127,6 @@ export default {
         host: "",
         lets_encrypt: "",
         http2https: "",
-        KEYCLOAK_ADMIN: "",
-        KEYCLOAK_ADMIN_PASSWORD: "",
       },
     };
   },
@@ -227,8 +194,6 @@ export default {
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isHttpToHttpsEnabled = config.http2https;
-      this.KEYCLOAK_ADMIN = config.KEYCLOAK_ADMIN;
-      this.KEYCLOAK_ADMIN_PASSWORD = config.KEYCLOAK_ADMIN_PASSWORD;
 
       this.loading.getConfiguration = false;
       this.focusElement("host");
@@ -263,8 +228,6 @@ export default {
       }
     },
     async configureModule() {
-      this.error.test_imap = false;
-      this.error.test_smtp = false;
       const isValidationOk = this.validateConfigureModule();
       if (!isValidationOk) {
         return;
@@ -298,8 +261,6 @@ export default {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
             http2https: this.isHttpToHttpsEnabled,
-            KEYCLOAK_ADMIN: this.KEYCLOAK_ADMIN,
-            KEYCLOAK_ADMIN_PASSWORD: this.KEYCLOAK_ADMIN_PASSWORD,
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
@@ -338,9 +299,5 @@ export default {
 @import "../styles/carbon-utils";
 .mg-bottom {
   margin-bottom: $spacing-06;
-}
-
-.maxwidth {
-  max-width: 38rem;
 }
 </style>
