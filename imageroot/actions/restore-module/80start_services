@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 set -e
@@ -9,9 +9,7 @@ set -e
 # Redirect any output to the journal (stderr)
 exec 1>&2
 
-# If the control reaches this step, the service can be enabled and started
-
-touch smarthost.env
-
+# If the control reaches this step, the service can be enabled and started.
+# Restarting the pod does not restart its containers: list all the services.
 systemctl --user enable keycloak.service
-systemctl --user restart keycloak.service
+systemctl --user restart keycloak.service postgresql-app.service keycloak-app.service

@@ -14,14 +14,23 @@ images=()
 repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
 reponame="keycloak"
-keycloak_version="26.3.5"
+# Node.js 25+ no longer ships Corepack, install it from npm
+# renovate: datasource=npm packageName=corepack
+corepack_version=0.36.0
+# Upstream Keycloak image, see https://github.com/keycloak/keycloak/releases
+# renovate: datasource=docker depName=quay.io/keycloak/keycloak
+keycloak_image="quay.io/keycloak/keycloak:26.8.2"
+# PostgreSQL stores all the Keycloak data
+# renovate: datasource=docker depName=docker.io/postgres
+postgres_image="docker.io/postgres:18.6-alpine3.24"
 # Create a new empty container image
 container=$(buildah from scratch)
 
 # Reuse existing nodebuilder-keycloak container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-keycloak; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-keycloak -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+    buildah from --name nodebuilder-keycloak -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
+    buildah run nodebuilder-keycloak sh -c "npm install -g corepack@${corepack_version} && corepack enable"
 fi
 
 echo "Build static UI files with node..."
@@ -34,18 +43,13 @@ buildah run \
 # Add imageroot directory to the container image
 buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
-# Setup the entrypoint, ask to reserve one TCP port with the label and set a rootless container
-# Select you image(s) with the label org.nethserver.images
-# ghcr.io/xxxxx is the GitHub container registry or your own registry or docker.io for Docker Hub
-# The image tag is set to latest by default, but can be overridden with the IMAGETAG environment variable
-# --label="org.nethserver.images=docker.io/mariadb:10.11.5 docker.io/roundcube/roundcubemail:1.6.4-apache"
-# rootfull=0 === rootless container
-# tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
+# Setup the entrypoint, reserve one TCP port (web UI behind Traefik) and set a rootless container
 buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/postgres:15.5-alpine3.19 quay.io/keycloak/keycloak:${keycloak_version}" \
+    --label="org.nethserver.min-core=3.12.4-0" \
+    --label="org.nethserver.images=${postgres_image} ${keycloak_image}" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"

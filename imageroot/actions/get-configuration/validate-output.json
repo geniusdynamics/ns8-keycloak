@@ -1,36 +1,36 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Get keycloak settings",
-    "$id": "http://nethserver.org/json-schema/task/input/keycloak/get-configuration",
-    "description": "Get keycloak settings",
-    "examples": [
-        {
-            "host": "keycloak.domain.org",
-            "http2https": true,
-            "lets_encrypt": true
-        }
-    ],
-    "type": "object",
-    "required": [
-        "host",
-        "http2https",
-        "lets_encrypt"
-    ],
-    "properties": {
-        "host": {
-            "type": "string",
-            "description": "Host name for the application, like 'keycloak.domain.org'",
-            "format": "idn-hostname"
-        },
-        "lets_encrypt": {
-            "type": "boolean",
-            "title": "Let's Encrypt certificate",
-            "description": "Request a valid Let's Encrypt certificate."
-        },
-        "http2https": {
-            "type": "boolean",
-            "title": "HTTP to HTTPS redirection",
-            "description": "Redirect all the HTTP requests to HTTPS"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Get keycloak settings",
+  "$id": "http://nethserver.org/json-schema/task/input/keycloak/get-configuration",
+  "description": "Get keycloak settings",
+  "examples": [
+    {
+      "host": "keycloak.example.org",
+      "http2https": true,
+      "lets_encrypt": false
     }
+  ],
+  "type": "object",
+  "required": [
+    "host",
+    "http2https",
+    "lets_encrypt"
+  ],
+  "properties": {
+    "host": {
+      "type": "string",
+      "description": "Host name for the application, like 'keycloak.example.org'",
+      "format": "idn-hostname"
+    },
+    "lets_encrypt": {
+      "type": "boolean",
+      "title": "Let's Encrypt certificate",
+      "description": "Request a valid Let's Encrypt certificate."
+    },
+    "http2https": {
+      "type": "boolean",
+      "title": "HTTP to HTTPS redirection",
+      "description": "Redirect all the HTTP requests to HTTPS"
+    }
+  }
 }
