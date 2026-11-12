@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 #
-# This systemd unit starts a keycloak instance using Podman.
-# Most parts of this file come from podman-generate-systemd.
+# This systemd unit starts the keycloak pod using Podman. The pod holds
+# the PostgreSQL and the Keycloak containers.
 #
 
 [Unit]
@@ -15,14 +15,15 @@ Before=postgresql-app.service keycloak-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=-%S/state/environment
+EnvironmentFile=-%E/state/environment
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/keycloak.pid %t/keycloak.pod-id
+# Keycloak serves HTTP on port 8080 behind Traefik, which terminates TLS
 ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/keycloak.pid \
     --pod-id-file %t/keycloak.pod-id \
     --name keycloak \
-    --publish 127.0.0.1:${TCP_PORT}:7443 \
+    --publish 127.0.0.1:${TCP_PORT}:8080 \
     --replace
 ExecStart=/usr/bin/podman pod start --pod-id-file %t/keycloak.pod-id
 ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/keycloak.pod-id -t 10

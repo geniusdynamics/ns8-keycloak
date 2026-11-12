@@ -1,19 +1,22 @@
 {
   "name": "keycloak",
   "description": {
-    "en": "My keycloak module"
+    "en": "Open source identity and access management with single sign-on, OpenID Connect and SAML, backed by PostgreSQL.",
+    "it": "Gestione open source di identità e accessi con single sign-on, OpenID Connect e SAML, con database PostgreSQL."
   },
-  "categories": [],
+  "categories": [
+    "security"
+  ],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Genius Dynamics",
+      "email": "support@genius.ke"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.keycloak.com/",
-    "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-keycloak"
+    "documentation_url": "https://www.keycloak.org/documentation",
+    "bug_url": "https://github.com/geniusdynamics/ns8-keycloak/issues",
+    "code_url": "https://github.com/geniusdynamics/ns8-keycloak"
   },
-  "source": "ghcr.io/nethserver/keycloak"
+  "source": "ghcr.io/geniusdynamics/keycloak"
 }
