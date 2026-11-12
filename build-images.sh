@@ -22,7 +22,7 @@ corepack_version=0.36.0
 keycloak_image="quay.io/keycloak/keycloak:26.8.2"
 # PostgreSQL stores all the Keycloak data
 # renovate: datasource=docker depName=docker.io/postgres
-postgres_image="docker.io/postgres:18.6-alpine3.24"
+postgres_image="docker.io/postgres:18.7-alpine3.24"
 # Create a new empty container image
 container=$(buildah from scratch)
 
