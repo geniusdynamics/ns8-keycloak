@@ -2,7 +2,7 @@
   "name": "keycloak",
   "description": {
     "en": "Open source identity and access management with single sign-on, OpenID Connect and SAML, backed by PostgreSQL.",
-    "it": "Gestione open source di identità e accessi con single sign-on, OpenID Connect e SAML, con database PostgreSQL."
+    "it": "Keycloak fornisce autenticazione unica, gestione delle identità e controllo degli accessi."
   },
   "categories": [
     "security"
