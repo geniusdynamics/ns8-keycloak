@@ -16,6 +16,7 @@ EnvironmentFile=%E/state/environment
 EnvironmentFile=-%E/state/passwords.env
 WorkingDirectory=%E/state
 Restart=always
+RestartSec=10
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/keycloak-app.pid %t/keycloak-app.ctr-id
 # Variables without a value are passed through from the unit environment.
