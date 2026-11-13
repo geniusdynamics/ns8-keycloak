@@ -45,14 +45,13 @@ Check if the configuration is returned
     ${output}  ${rc} =    Execute Command    api-cli run module/${module_id}/get-configuration
     ...    return_rc=True
     Should Be Equal As Integers    ${rc}  0
-    &{config} =    Evaluate    json.loads($output)['output']    json
+    &{config} =    Evaluate    json.loads($output)    json
     Should Be Equal    ${config.host}    ${HOST}
 
 Check if keycloak works as expected
-    # The first start builds the Keycloak runtime configuration and
-    # initializes the database: allow enough time
-    Wait Until Keyword Succeeds    300s    5s    Keycloak answers through Traefik
-    Wait Until Keyword Succeeds    60s    3s    Admin console is served through Traefik
+    ${rc} =    Execute Command    bash -c 'for i in $(seq 1 60); do curl -k -s -o /dev/null -f --resolve ${HOST}:443:127.0.0.1 https://${HOST}/ && exit 0; sleep 5; done; exit 1'
+    ...    return_rc=True  return_stdout=False
+    Should Be Equal As Integers    ${rc}  0
 
 Take screenshots
     [Tags]    ui
