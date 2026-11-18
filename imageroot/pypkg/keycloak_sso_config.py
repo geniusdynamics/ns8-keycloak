@@ -149,9 +149,14 @@ def configure(enable):
             oidc.publish(True)
         else:
             kc = kcadmin.agent_client()
-            for realm in oidc.managed_realms(kc):
+            realms = oidc.managed_realms(kc)
+            for realm in realms:
                 for client in kc.get(f"/{realm}/clients"):
                     if (client.get("attributes") or {}).get(oidc.MODULE_ATTRIBUTE) == client["clientId"]:
                         kc.delete(f"/{realm}/clients/{client['id']}")
+            bound = agent.get_bound_domain_list(agent.redis_connect())
+            remaining = [domain for domain in bound if domain not in realms]
+            if remaining != bound:
+                agent.bind_user_domains(remaining, check=True)
             agent.set_env("NS8_OIDC_ENABLED", False)
             oidc.publish(False)

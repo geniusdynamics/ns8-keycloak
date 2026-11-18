@@ -119,8 +119,9 @@ the first module registers for its domain. The issuer is
 owning module is removed or unbound.
 
 Disable NS8 SSO before changing the provider hostname. Disabling withdraws
-the service record and deletes the managed module clients. Keycloak retains
-the realms and their LDAP federation.
+the service record, deletes the managed module clients, and releases NS8
+bindings for the managed domains. Keycloak retains the realms and their LDAP
+federation settings.
 
 ```bash
 api-cli run module/keycloak1/configure-ns8-sso --data '{"enabled":false}'

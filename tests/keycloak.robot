@@ -108,7 +108,12 @@ Register an NS8 client and sign in against the user domain
     Run successfully    umask 077 && api-cli run module/${module_id}/register-client --data '${data}' > /root/keycloak-sso-app.json
     Run successfully    umask 077 && api-cli run module/${module_id}/register-client --data '${data}' > /root/keycloak-sso-app-repeat.json && cmp /root/keycloak-sso-app.json /root/keycloak-sso-app-repeat.json
     Wait Until Keyword Succeeds    60s    5s    Run successfully    python3 /root/keycloak-sso.py ${HOST} ${LDAP_DOMAIN} ${LDAP_USER} ${LDAP_PASSWORD} < /root/keycloak-sso-app.json
+    Run successfully    redis-cli --no-auth-warning hdel cluster/module_domains ${SAMPLE_APP}
+    Run successfully    redis-cli --no-auth-warning publish cluster/event/module-domain-changed '{"modules":["${SAMPLE_APP}"],"domains":["${LDAP_DOMAIN}"]}'
+    Wait Until Keyword Succeeds    30s    2s    Run successfully    runagent -m ${module_id} python3 -c 'import kcadmin, sys; assert kcadmin.agent_client().find_client(sys.argv[1], sys.argv[2]) is None' ${LDAP_DOMAIN} ${SAMPLE_APP}
     Run successfully    api-cli run module/${module_id}/configure-ns8-sso --data '{"enabled":false}'
+    ${bound} =    Run successfully    redis-cli --no-auth-warning hget cluster/module_domains ${module_id}
+    Should Be Empty    ${bound}
     ${published} =    Run successfully    redis-cli --no-auth-warning exists module/${module_id}/srv/http/oidc
     Should Be Equal As Integers    ${published}    0
 
