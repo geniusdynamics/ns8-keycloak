@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+import json
+import os
+import sys
+
+from keycloak_oidc import enabled, validation
+
+if enabled():
+    request = json.load(sys.stdin)
+    if request["host"] != os.environ.get("TRAEFIK_HOST"):
+        validation("host", request["host"], "disable_ns8_sso_first")
+    if request.get("http2https", True) is False:
+        validation("http2https", False, "disable_ns8_sso_first")

@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "register-client input",
+    "$id": "http://schema.nethserver.org/keycloak/register-client-input.json",
+    "description": "Create or update the calling module's OIDC client for a bound NS8 user domain. The client ID is the module ID.",
+    "examples": [
+        {
+            "domain": "dp.example.org",
+            "redirect_uris": [
+                "https://cloud.example.org/apps/user_oidc/code"
+            ],
+            "post_logout_redirect_uris": [
+                "https://cloud.example.org/*"
+            ],
+            "web_origins": [
+                "https://cloud.example.org"
+            ]
+        },
+        {
+            "domain": "dp.example.org",
+            "redirect_uris": [
+                "https://webmail.example.org/index.php/login/oauth"
+            ],
+            "audience": [
+                "mail1"
+            ],
+            "rotate_secret": true
+        }
+    ],
+    "type": "object",
+    "required": [
+        "domain"
+    ],
+    "properties": {
+        "domain": {
+            "description": "User domain of the realm. The calling module must be bound to it",
+            "type": "string",
+            "minLength": 1
+        },
+        "redirect_uris": {
+            "description": "Redirect URIs of the authorization code flow. Without redirect URIs the client can only authenticate its own requests, for example token introspection",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength": 1
+            },
+            "default": [],
+            "uniqueItems": true
+        },
+        "post_logout_redirect_uris": {
+            "description": "URIs where the logout redirects the user. Applications should pass their exact logout URI. If the attribute is missing, a wildcard URI for each origin of the redirect URIs is set, like https://cloud.example.org/*; an empty list allows none",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength": 1
+            },
+            "uniqueItems": true
+        },
+        "web_origins": {
+            "description": "Allowed CORS origins",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+            },
+            "default": [],
+            "uniqueItems": true
+        },
+        "audience": {
+            "description": "Client IDs added to the audience of the tokens, for example the mail module whose Dovecot introspects them",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_.-]+$",
+                "maxLength": 255
+            },
+            "default": [],
+            "uniqueItems": true
+        },
+        "rotate_secret": {
+            "description": "Generate a new client secret. Otherwise the current secret is returned",
+            "type": "boolean",
+            "default": false
+        },
+        "module_id": {
+            "description": "Module that owns the client. Allowed only for tasks without a calling user, for example created by the cluster agent: otherwise the owner is the calling module",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.-]+$"
+        }
+    },
+    "additionalProperties": false
+}

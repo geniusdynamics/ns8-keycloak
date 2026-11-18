@@ -1,0 +1,4 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -e
+redis-exec SADD "${AGENT_ID}/roles/clientadm" register-client >&2

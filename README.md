@@ -39,13 +39,13 @@ EOF
 | `docker.io/postgres` | `18.7-alpine3.24` |
 | `quay.io/keycloak/keycloak` | `26.8.2` |
 
-Requires NS8 core `3.12.4-0` or newer.
+Requires NS8 core `3.20.1` or newer.
 
 ## Network and access
 
 - Reserves 1 TCP port(s) on the node. The web application is published through Traefik on the configured host name.
 - Runs rootless.
-- Declares these NS8 authorizations: `traefik@node:routeadm`.
+- Declares these NS8 authorizations: `traefik@node:routeadm` and `cluster:accountconsumer`.
 
 ## Backup
 
@@ -92,3 +92,40 @@ Application documentation: https://www.keycloak.org/documentation
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
+
+## NS8 single sign-on
+
+The optional NS8 OIDC provider gives each user domain its own Keycloak realm
+with read-only LDAP federation. It leaves existing realms and clients alone.
+If a manually managed realm already uses a domain's name, Keycloak rejects the
+NS8 registration for that domain. Module **1.0.0** is the minimum upgrade
+source for this integration.
+
+Configure the module with HTTPS redirection and a certificate trusted by its
+consumers. Then enable the provider on the instance.
+
+```bash
+api-cli run module/keycloak1/configure-ns8-sso --data '{"enabled":true}'
+```
+
+The first activation restarts Keycloak briefly to create a service account.
+Its credentials are stored in the module's private state and included in NS8
+backups. Subsequent activations reuse those credentials.
+
+Consuming modules declare `keycloak@any:clientadm`, bind their user domain,
+and use `register-client` to obtain client credentials. A realm is created when
+the first module registers for its domain. The issuer is
+`https://<host>/realms/<user-domain>`. Registrations are removed when their
+owning module is removed or unbound.
+
+Disable NS8 SSO before changing the provider hostname. Disabling withdraws
+the service record, deletes the managed module clients, and releases NS8
+bindings for the managed domains. Keycloak retains the realms and their LDAP
+federation settings.
+
+```bash
+api-cli run module/keycloak1/configure-ns8-sso --data '{"enabled":false}'
+```
+
+See the [NS8 single sign-on developer contract](https://nethserver.github.io/ns8-core/core/user_domains/#single-sign-on)
+and the [NS8 application SSO tracking issue](https://github.com/NethServer/dev/issues/8258).

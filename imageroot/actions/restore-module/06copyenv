@@ -20,4 +20,7 @@ for evar in [
     ]:
     agent.set_env(evar, original_environment[evar])
 
+if "NS8_OIDC_ENABLED" in original_environment:
+    agent.set_env("NS8_OIDC_ENABLED", original_environment["NS8_OIDC_ENABLED"])
+
 agent.dump_env()
