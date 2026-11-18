@@ -18,6 +18,7 @@ import keycloak_oidc as oidc
 
 TEMP_PREFIX = "ns8-keycloak-bootstrap-"
 AGENT_MARKER = "ns8.keycloak.module-agent"
+ADMIN_API_SCOPE = "kc-admin-api"
 
 
 def bootstrap_path():
@@ -94,6 +95,15 @@ def create_agent_client(admin):
         rep = admin.find_client("master", kcadmin.AGENT_CLIENT_ID)
     else:
         admin.put(f"{clients}/{rep['id']}", {**rep, **update})
+    # Keycloak 26.8 requires this scope and audience on Admin API tokens.
+    # Attach it only to the NS8 service account.
+    scope = next(
+        (scope for scope in admin.get("/master/client-scopes") if scope["name"] == ADMIN_API_SCOPE),
+        None,
+    )
+    if scope is None:
+        raise RuntimeError("Keycloak is missing its Admin API client scope")
+    admin.put(f"{clients}/{rep['id']}/default-client-scopes/{scope['id']}")
     user = admin.get(f"{clients}/{rep['id']}/service-account-user")
     admin.post(f"/master/users/{user['id']}/role-mappings/realm", [
         admin.get("/master/roles/create-realm"),
@@ -107,7 +117,8 @@ def create_agent_client(admin):
             admin.post(f"/master/users/{user['id']}/role-mappings/clients/{management['id']}", [
                 admin.get(f"{clients}/{management['id']}/roles/realm-admin"),
             ])
-    kcadmin.Client(kcadmin.AGENT_CLIENT_ID, secret).token()
+    candidate = kcadmin.Client(kcadmin.AGENT_CLIENT_ID, secret)
+    oidc.managed_realms(candidate)
     kcadmin.save_agent_secret(secret)
 
 

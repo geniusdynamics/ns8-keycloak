@@ -364,6 +364,8 @@ def reconcile():
                 update_ldap(kc, domain, get_realm(kc, domain), lp, ldap)
             for client in kc.get(f"/{domain}/clients"):
                 owner = (client.get("attributes") or {}).get(MODULE_ATTRIBUTE)
-                if owner and (ldap is None or domain not in agent.get_bound_domain_list(rdb, owner)):
+                if owner == client["clientId"] and (
+                    ldap is None or domain not in agent.get_bound_domain_list(rdb, owner)
+                ):
                     kc.delete(f"/{domain}/clients/{client['id']}")
         publish(True)

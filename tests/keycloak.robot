@@ -11,7 +11,7 @@ ${SCENARIO}    install
 ${RELEASE_IMAGE}    ghcr.io/geniusdynamics/keycloak:1.0.0
 ${LDAP_IMAGE}    ghcr.io/nethserver/openldap:2.8.1
 ${LDAP_DOMAIN}    keycloak-ci.test
-${LDAP_USER}    admin
+${LDAP_USER}    oidctest
 ${LDAP_PASSWORD}    KeycloakLDAP-Test-2026
 ${directory_id}    ${EMPTY}
 ${SAMPLE_APP}    keycloaksample1
@@ -94,7 +94,8 @@ Register an NS8 client and sign in against the user domain
     ${output} =    Run successfully    add-module ${LDAP_IMAGE} 1
     ${id} =    Evaluate    ast.literal_eval($output)['module_id']    modules=ast
     Set Suite Variable    ${directory_id}    ${id}
-    Run successfully    api-cli run module/${directory_id}/configure-module --data '{"provision":"new-domain","domain":"${LDAP_DOMAIN}","admuser":"${LDAP_USER}","admpass":"${LDAP_PASSWORD}"}'
+    Run successfully    api-cli run module/${directory_id}/configure-module --data '{"provision":"new-domain","domain":"${LDAP_DOMAIN}","admuser":"admin","admpass":"${LDAP_PASSWORD}"}'
+    Run successfully    api-cli run module/${directory_id}/add-user --data '{"user":"${LDAP_USER}","display_name":"OIDC Test","password":"${LDAP_PASSWORD}","mail":"${LDAP_USER}@${LDAP_DOMAIN}"}'
     Put File    ${CURDIR}/sso.py    /root/keycloak-sso.py
     Run successfully    api-cli run module/${module_id}/configure-ns8-sso --data '{"enabled":true}'
     ${prefix} =    Run successfully    redis-cli --no-auth-warning hget module/${module_id}/srv/http/oidc issuer_url_prefix
