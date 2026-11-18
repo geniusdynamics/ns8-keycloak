@@ -18,7 +18,9 @@ WorkingDirectory=%E/state
 Restart=always
 RestartSec=10
 TimeoutStopSec=70
+TimeoutStartSec=330
 ExecStartPre=/bin/rm -f %t/keycloak-app.pid %t/keycloak-app.ctr-id
+ExecStartPre=-/usr/local/bin/runagent bootstrap-ns8-sso
 # Variables without a value are passed through from the unit environment.
 # TLS is terminated by Traefik, which sets the X-Forwarded-* headers.
 # The management interface (health endpoints) listens on port 9000 inside
@@ -37,6 +39,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/keycloak-app.pid \
     --env=KC_BOOTSTRAP_ADMIN_USERNAME=admin \
     --env=KC_BOOTSTRAP_ADMIN_PASSWORD \
     ${KEYCLOAK_IMAGE} start
+ExecStartPost=-/usr/local/bin/runagent reconcile-ns8-sso --starting
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/keycloak-app.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/keycloak-app.ctr-id
 SyslogIdentifier=%u
